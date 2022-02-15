@@ -1,0 +1,105 @@
+package com.bitnet.paulo.papuafk.manager;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Sound;
+import org.bukkit.entity.Player;
+
+import com.bitnet.paulo.papuafk.Main;
+import com.bitnet.paulo.papuafk.player.AFKPlayer;
+
+public class AFKManager {
+	
+	private ArrayList<String> afk_list;
+	private HashMap<Player, AFKPlayer> afk_map;
+	
+	private final Main plugin;
+	public AFKManager(Main plugin) {
+		this.plugin = plugin;
+		this.afk_list = new ArrayList<>();
+		this.afk_map = new HashMap<>();
+	}
+	
+	public ArrayList<String> getAfk_list() {
+		return afk_list;
+	}
+	public HashMap<Player, AFKPlayer> getAfk_map() {
+		return afk_map;
+	}
+
+	public Main getPlugin() {
+		return plugin;
+	}
+	
+	public void createAFKPlayer(Player p) {
+		if(!this.containsAFKPlayer(p)) {
+			AFKPlayer afk = new AFKPlayer();
+			afk.setName(p.getName());
+			afk.setAfk(false);
+			afk.setLoc(null);
+			afk.setPlayTime(0);
+			afk_map.put(p, afk);
+		}
+	}
+	
+	public boolean containsAFKPlayer(Player p) {
+		return this.getAfk_map().containsKey(p);
+	}
+	
+	public AFKPlayer getAFKPlayer(Player p) {
+		if(this.containsAFKPlayer(p)) {
+			return this.getAfk_map().get(p);
+		}else {
+			return null;
+		}
+	}
+	
+	public void actionsAFK(Player p) {
+		if(!this.getAFKPlayer(p).isAfk()) {
+			if(!this.getAfk_list().contains(this.getAFKPlayer(p).getName())) {
+				for(Player player : Bukkit.getOnlinePlayers()) {
+					AFKPlayer afk = this.getAFKPlayer(p);
+					if(this.getPlugin().isProtocolHook()) {
+						this.getPlugin().getPackets().sendHologram(p, Arrays.asList("&8&m<===============[&b+&8] &c&lOJITO &8[&b+&8&m]===============>", "&fEste pedazo de homosexual: &e%player_name%", "&fEsta AFK! pero ya va a regresar", "&8&m<===============[&b+&8] &c&lOJITO &8[&b+&8&m]===============>"), player);
+					}
+					player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&e" + p.getName() + " &fEsta AFK :v"));
+					p.playSound(p.getLocation(), Sound.ENTITY_BAT_HURT, 1.0f, 1.0f);
+					afk.setAfk(true);
+					afk.setLoc(p.getLocation());
+					afk.setName(p.getName());
+					if(!this.afk_list.contains(afk.getName())) {
+						this.afk_list.add(afk.getName());
+					}
+					this.getAfk_map().put(p, afk);
+				}
+			}
+		}
+	}
+	
+	public void actionsUnAFK(Player p) {
+		if(this.getAFKPlayer(p).isAfk()) {
+			if(this.getAfk_list().contains(this.getAFKPlayer(p).getName())) {
+				for(Player player : Bukkit.getOnlinePlayers()) {
+					AFKPlayer afk = this.getAFKPlayer(p);
+					if(this.getPlugin().isProtocolHook()) {
+						this.getPlugin().getPackets().deleteHologram(p);
+					}
+					player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&e" + p.getName() + " &fRevivio :D"));
+					p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 2.0f);
+					afk.setAfk(false);
+					afk.setLoc(null);
+					afk.setPlayTime(0);
+					afk.setName(p.getName());
+					if(this.afk_list.contains(afk.getName())) {
+						this.afk_list.remove(afk.getName());
+					}
+					this.getAfk_map().put(p, afk);
+				}
+			}
+		}
+	}
+}
