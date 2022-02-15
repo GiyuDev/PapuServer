@@ -7,5 +7,5 @@ softdepend:
    - ProtocolLib
    - PlaceholderAPI
 commands:
-   test:
+   afk:
       description: ""

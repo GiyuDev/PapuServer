@@ -56,7 +56,7 @@ public class Main extends JavaPlugin {
 	public void onEnable() {
 		this.getLogger().info("Iniciando el plugin...");
 		this.afkManager = new AFKManager(this);
-		this.packets = new PacketsUtils();
+		this.packets = new PacketsUtils(this);
 		this.registerListener(new PlayerListeners(this));
 		this.registerCommands();
 		Bukkit.getScheduler().runTaskLater(this, this::checkHooks, 5L);

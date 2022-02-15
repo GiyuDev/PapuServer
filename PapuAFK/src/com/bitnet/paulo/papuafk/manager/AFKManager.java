@@ -67,6 +67,7 @@ public class AFKManager {
 					AFKPlayer afk = this.getAFKPlayer(p);
 					if(this.getPlugin().isProtocolHook()) {
 						this.getPlugin().getPackets().sendHologram(p, Arrays.asList("&8&m<===============[&b+&8] &c&lOJITO &8[&b+&8&m]===============>", "&fEste pedazo de homosexual: &e%player_name%", "&fEsta AFK! pero ya va a regresar", "&8&m<===============[&b+&8] &c&lOJITO &8[&b+&8&m]===============>"), player);
+						this.getPlugin().getPackets().replcePlayerEntity(p, player);
 					}
 					player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&e" + p.getName() + " &fEsta AFK :v"));
 					p.playSound(p.getLocation(), Sound.ENTITY_BAT_HURT, 1.0f, 1.0f);
@@ -90,6 +91,7 @@ public class AFKManager {
 					AFKPlayer afk = this.getAFKPlayer(p);
 					if(this.getPlugin().isProtocolHook()) {
 						this.getPlugin().getPackets().deleteHologram(p);
+						this.getPlugin().getPackets().deleteEntityPlayer(p);
 					}
 					player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&e" + p.getName() + " &fRevivio :D"));
 					p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 2.0f);
