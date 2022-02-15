@@ -45,11 +45,12 @@ public class PlayerListeners implements Listener {
 	}
 	
 	@EventHandler
-	public void joinHologram(PlayerJoinEvent e) {
+	public void joinPackets(PlayerJoinEvent e) {
 		Player p = e.getPlayer();
 		for(Player player : this.getPlugin().getAfkManager().getAfk_list()) {
 			if(this.getPlugin().isProtocolHook()) {
 				this.getPlugin().getPackets().sendHologram(player, Arrays.asList("&8&m<===============[&b+&8] &c&lOJITO &8[&b+&8&m]===============>", "&fEste pedazo de homosexual: &e%player_name%", "&fEsta AFK! pero ya va a regresar", "&8&m<===============[&b+&8] &c&lOJITO &8[&b+&8&m]===============>"), p);
+				this.getPlugin().getPackets().replcePlayerEntity(player, p);
 			}
 		}
 	}
@@ -85,6 +86,7 @@ public class PlayerListeners implements Listener {
 						public void run() {
 							// TODO Auto-generated method stub
 							getPlugin().getPackets().sendHologram(player, Arrays.asList("&8&m<===============[&b+&8] &c&lOJITO &8[&b+&8&m]===============>", "&fEste pedazo de homosexual: &e%player_name%", "&fEsta AFK! pero ya va a regresar", "&8&m<===============[&b+&8] &c&lOJITO &8[&b+&8&m]===============>"), p);
+							getPlugin().getPackets().replcePlayerEntity(player, p);
 						}
 						
 					}.runTaskLater(this.getPlugin(), 5L);
