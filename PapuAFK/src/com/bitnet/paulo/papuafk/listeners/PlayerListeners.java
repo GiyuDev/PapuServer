@@ -8,6 +8,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -38,6 +39,16 @@ public class PlayerListeners implements Listener {
 		if(this.getPlugin().getAfkManager().containsAFKPlayer(p)) {
 			AFKPlayer afk = this.getPlugin().getAfkManager().getAFKPlayer(p);
 			afk.setPlayTime(0);
+			if(this.getPlugin().getAfkManager().getAfk_list().contains(p)) {
+				this.getPlugin().getAfkManager().actionsUnAFK(p);
+			}
+		}
+	}
+	
+	@EventHandler
+	public void chat(AsyncPlayerChatEvent e) {
+		Player p = e.getPlayer();
+		if(this.getPlugin().getAfkManager().containsAFKPlayer(p)) {
 			if(this.getPlugin().getAfkManager().getAfk_list().contains(p)) {
 				this.getPlugin().getAfkManager().actionsUnAFK(p);
 			}
