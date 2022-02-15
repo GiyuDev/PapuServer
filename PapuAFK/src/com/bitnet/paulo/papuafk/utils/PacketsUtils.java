@@ -59,7 +59,7 @@ public class PacketsUtils {
 	public void sendHologram(Player p, List<String> lines, Player viewer) {
 		Location toCopy = p.getLocation();
 		double xOffSet = 0.0;
-		double yOffSet = 2.0;
+		double yOffSet = 1.0;
 		double zOffSet = 0.0;
 		for(int i = 0; i < lines.size(); i++) {
 			PacketContainer packet = new PacketContainer(PacketType.Play.Server.SPAWN_ENTITY); 

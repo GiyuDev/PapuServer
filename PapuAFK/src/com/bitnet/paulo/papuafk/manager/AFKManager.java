@@ -6,9 +6,10 @@ import java.util.HashMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import com.bitnet.paulo.papuafk.Main;
 import com.bitnet.paulo.papuafk.player.AFKPlayer;
@@ -65,16 +66,29 @@ public class AFKManager {
 			if(!this.getAfk_list().contains(p)) {
 				for(Player player : Bukkit.getOnlinePlayers()) {
 					AFKPlayer afk = this.getAFKPlayer(p);
-					if(this.getPlugin().isProtocolHook()) {
-						this.getPlugin().getPackets().sendHologram(p, Arrays.asList("&8&m<===============[&b+&8] &c&lOJITO &8[&b+&8&m]===============>", "&fEste pedazo de homosexual: &e%player_name%", "&fEsta AFK! pero ya va a regresar", "&8&m<===============[&b+&8] &c&lOJITO &8[&b+&8&m]===============>"), player);
-						this.getPlugin().getPackets().replcePlayerEntity(p, player);
-					}
 					player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&e" + p.getName() + " &fEsta AFK :v"));
 					p.playSound(p.getLocation(), Sound.ENTITY_BAT_HURT, 1.0f, 1.0f);
-					p.setGameMode(GameMode.SPECTATOR);
 					p.hidePlayer(player);
 					afk.setAfk(true);
-					afk.setLoc(p.getLocation());
+					if(this.getPlugin().getDatabase().playerHasFile(p)) {
+						this.getPlugin().getDatabase().updateLastLocationDatabase(p);
+						this.getPlugin().getDatabase().updateAFKInventoryDatabase(p);
+						this.getPlugin().getDatabase().updateAFKArmorDatabase(p);
+						afk.setLoc(this.getPlugin().getDatabase().getLastLocationDatabase(p));
+						p.teleport(this.getPlugin().getDatabase().getAFKLocationDatabase(p));
+						Bukkit.getScheduler().runTaskLater(plugin, ()->{
+							ItemStack[] nulled = {new ItemStack(Material.AIR)};
+							p.getInventory().setContents(nulled);
+							p.getInventory().setHelmet(new ItemStack(Material.AIR));
+							p.getInventory().setChestplate(new ItemStack(Material.AIR));
+							p.getInventory().setLeggings(new ItemStack(Material.AIR));
+							p.getInventory().setBoots(new ItemStack(Material.AIR));
+							if(this.getPlugin().isProtocolHook()) {
+								this.getPlugin().getPackets().sendHologram(p, Arrays.asList("&8&m<===============[&b+&8] &c&lOJITO &8[&b+&8&m]===============>", "&fEste pedazo de homosexual: &e%player_name%", "&fEsta AFK! pero ya va a regresar", "&8&m<===============[&b+&8] &c&lOJITO &8[&b+&8&m]===============>"), player);
+								this.getPlugin().getPackets().replcePlayerEntity(p, player);
+							}
+						}, 20L);
+					}
 					if(!this.afk_list.contains(player)) {
 						this.afk_list.add(player);
 					}
@@ -89,16 +103,25 @@ public class AFKManager {
 			if(this.getAfk_list().contains(p)) {
 				for(Player player : Bukkit.getOnlinePlayers()) {
 					AFKPlayer afk = this.getAFKPlayer(p);
-					if(this.getPlugin().isProtocolHook()) {
-						this.getPlugin().getPackets().deleteHologram(p);
-						this.getPlugin().getPackets().deleteEntityPlayer(p);
-					}
 					player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&e" + p.getName() + " &fRevivio :D"));
 					p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 2.0f);
-					p.setGameMode(GameMode.SURVIVAL);
 					p.showPlayer(player);
 					afk.setAfk(false);
-					afk.setLoc(null);
+					if(this.getPlugin().getDatabase().playerHasFile(p)) {
+						p.teleport(this.getPlugin().getDatabase().getLastLocationDatabase(p));
+						Bukkit.getScheduler().runTaskLater(plugin, ()-> {
+							if(!(this.getPlugin().getDatabase().getAFKInventoryDatabase(p).length == 0)) {
+								p.getInventory().setContents(this.getPlugin().getDatabase().getAFKInventoryDatabase(p));
+							}
+							if(!(this.getPlugin().getDatabase().getAFKArmorDatabase(p).length == 0)) {
+								p.getInventory().setArmorContents(this.getPlugin().getDatabase().getAFKArmorDatabase(p));
+							}
+							if(this.getPlugin().isProtocolHook()) {
+								this.getPlugin().getPackets().deleteHologram(p);
+								this.getPlugin().getPackets().deleteEntityPlayer(p);
+							}
+						}, 20L);
+					}
 					afk.setPlayTime(0);
 					if(this.afk_list.contains(p)) {
 						this.afk_list.remove(p);

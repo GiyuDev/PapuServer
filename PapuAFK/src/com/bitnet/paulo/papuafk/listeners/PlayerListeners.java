@@ -3,10 +3,13 @@ package com.bitnet.paulo.papuafk.listeners;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -31,6 +34,20 @@ public class PlayerListeners implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void entrar(PlayerJoinEvent e) {
 		this.getPlugin().getAfkManager().createAFKPlayer(e.getPlayer());
+		this.getPlugin().getDatabase().createPlayer(e.getPlayer());
+	}
+	
+	@EventHandler(priority = EventPriority.HIGH)
+	public void salir(PlayerQuitEvent e) {
+		Player p = e.getPlayer();
+		if(this.getPlugin().getAfkManager().containsAFKPlayer(p)) {
+			Bukkit.getScheduler().runTaskLater(plugin, ()->{
+				this.getPlugin().getAfkManager().getAfk_map().remove(p);
+			}, 1L);
+			if(this.getPlugin().getAfkManager().getAfk_list().contains(p)) {
+				this.getPlugin().getAfkManager().actionsUnAFK(p);
+			}
+		}
 	}
 	
 	@EventHandler(priority = EventPriority.HIGHEST)
@@ -39,7 +56,7 @@ public class PlayerListeners implements Listener {
 		if(this.getPlugin().getAfkManager().containsAFKPlayer(p)) {
 			AFKPlayer afk = this.getPlugin().getAfkManager().getAFKPlayer(p);
 			afk.setPlayTime(0);
-			if(this.getPlugin().getAfkManager().getAfk_list().contains(p)) {
+			if(this.getPlugin().getAfkManager().getAfk_list().contains(p) || this.getPlugin().getAfkManager().getAFKPlayer(p).getPlayTime() >= 60) {
 				this.getPlugin().getAfkManager().actionsUnAFK(p);
 			}
 		}
@@ -72,6 +89,28 @@ public class PlayerListeners implements Listener {
 		if(this.getPlugin().getAfkManager().containsAFKPlayer(p)) {
 			if(this.getPlugin().getAfkManager().getAfk_list().contains(p)) {
 				this.getPlugin().getAfkManager().actionsUnAFK(p);
+			}
+		}
+	}
+	
+	@EventHandler
+	public void cancelDamage(EntityDamageByEntityEvent e) {
+		if(e.getEntity() instanceof Player) {
+			Player p = (Player) e.getEntity();
+			if(this.getPlugin().getAfkManager().containsAFKPlayer(p)) {
+				if(this.getPlugin().getAfkManager().getAfk_list().contains(p)) {
+					e.setCancelled(true);
+				}
+			}
+		}
+	}
+	
+	@EventHandler
+	public void cancelFoodLevelChange(FoodLevelChangeEvent e) {
+		Player p = (Player) e.getEntity();
+		if(this.getPlugin().getAfkManager().containsAFKPlayer(p)) {
+			if(this.getPlugin().getAfkManager().getAfk_list().contains(p)) {
+				e.setCancelled(true);
 			}
 		}
 	}

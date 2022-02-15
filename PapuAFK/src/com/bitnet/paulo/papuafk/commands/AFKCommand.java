@@ -31,6 +31,19 @@ public class AFKCommand implements CommandExecutor {
 				}else {
 					p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c&lEY! hands up nigga, you can't do that, open fire this man is black!!"));
 				}
+			}else {
+				if(p.isOp()) {
+					switch(args[0]) {
+					case "setafklocation":
+						if(this.getPlugin().getAfkManager().containsAFKPlayer(p)) {
+							this.getPlugin().getDatabase().updateAFKLocationDatabase(p);
+							p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&fUbicacion guardada en: " + "&c" + this.getPlugin().getDatabase().getAFKLocationDatabase(p)));
+						}
+						break;
+					}
+				}else {
+					p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c&lEY! hands up nigga, you can't do that, open fire this man is black!!"));
+				}
 			}
 		}
 		return true;
