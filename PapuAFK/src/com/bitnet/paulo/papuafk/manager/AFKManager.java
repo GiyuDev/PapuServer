@@ -14,7 +14,7 @@ import com.bitnet.paulo.papuafk.player.AFKPlayer;
 
 public class AFKManager {
 	
-	private ArrayList<String> afk_list;
+	private ArrayList<Player> afk_list;
 	private HashMap<Player, AFKPlayer> afk_map;
 	
 	private final Main plugin;
@@ -24,7 +24,7 @@ public class AFKManager {
 		this.afk_map = new HashMap<>();
 	}
 	
-	public ArrayList<String> getAfk_list() {
+	public ArrayList<Player> getAfk_list() {
 		return afk_list;
 	}
 	public HashMap<Player, AFKPlayer> getAfk_map() {
@@ -60,7 +60,7 @@ public class AFKManager {
 	
 	public void actionsAFK(Player p) {
 		if(!this.getAFKPlayer(p).isAfk()) {
-			if(!this.getAfk_list().contains(this.getAFKPlayer(p).getName())) {
+			if(!this.getAfk_list().contains(p)) {
 				for(Player player : Bukkit.getOnlinePlayers()) {
 					AFKPlayer afk = this.getAFKPlayer(p);
 					if(this.getPlugin().isProtocolHook()) {
@@ -70,11 +70,9 @@ public class AFKManager {
 					p.playSound(p.getLocation(), Sound.ENTITY_BAT_HURT, 1.0f, 1.0f);
 					afk.setAfk(true);
 					afk.setLoc(p.getLocation());
-					afk.setName(p.getName());
-					if(!this.afk_list.contains(afk.getName())) {
-						this.afk_list.add(afk.getName());
+					if(!this.afk_list.contains(player)) {
+						this.afk_list.add(player);
 					}
-					this.getAfk_map().put(p, afk);
 				}
 			}
 		}
@@ -82,7 +80,7 @@ public class AFKManager {
 	
 	public void actionsUnAFK(Player p) {
 		if(this.getAFKPlayer(p).isAfk()) {
-			if(this.getAfk_list().contains(this.getAFKPlayer(p).getName())) {
+			if(this.getAfk_list().contains(p)) {
 				for(Player player : Bukkit.getOnlinePlayers()) {
 					AFKPlayer afk = this.getAFKPlayer(p);
 					if(this.getPlugin().isProtocolHook()) {
@@ -93,11 +91,9 @@ public class AFKManager {
 					afk.setAfk(false);
 					afk.setLoc(null);
 					afk.setPlayTime(0);
-					afk.setName(p.getName());
-					if(this.afk_list.contains(afk.getName())) {
-						this.afk_list.remove(afk.getName());
+					if(this.afk_list.contains(p)) {
+						this.afk_list.remove(p);
 					}
-					this.getAfk_map().put(p, afk);
 				}
 			}
 		}

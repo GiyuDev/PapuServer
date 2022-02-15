@@ -6,7 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.bitnet.paulo.papuafk.commands.TestCMD;
+import com.bitnet.paulo.papuafk.commands.AFKCommand;
 import com.bitnet.paulo.papuafk.listeners.PlayerListeners;
 import com.bitnet.paulo.papuafk.manager.AFKManager;
 import com.bitnet.paulo.papuafk.task.AFKTask;
@@ -79,6 +79,6 @@ public class Main extends JavaPlugin {
 	}
 	
 	private void registerCommands() {
-		this.getCommand("test").setExecutor(new TestCMD(this));
+		this.getCommand("afk").setExecutor(new AFKCommand(this));
 	}
 }
