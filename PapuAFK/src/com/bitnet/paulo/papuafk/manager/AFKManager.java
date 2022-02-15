@@ -6,6 +6,7 @@ import java.util.HashMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
@@ -58,6 +59,7 @@ public class AFKManager {
 		}
 	}
 	
+	@SuppressWarnings("deprecation")
 	public void actionsAFK(Player p) {
 		if(!this.getAFKPlayer(p).isAfk()) {
 			if(!this.getAfk_list().contains(p)) {
@@ -68,6 +70,8 @@ public class AFKManager {
 					}
 					player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&e" + p.getName() + " &fEsta AFK :v"));
 					p.playSound(p.getLocation(), Sound.ENTITY_BAT_HURT, 1.0f, 1.0f);
+					p.setGameMode(GameMode.SPECTATOR);
+					p.hidePlayer(player);
 					afk.setAfk(true);
 					afk.setLoc(p.getLocation());
 					if(!this.afk_list.contains(player)) {
@@ -78,6 +82,7 @@ public class AFKManager {
 		}
 	}
 	
+	@SuppressWarnings("deprecation")
 	public void actionsUnAFK(Player p) {
 		if(this.getAFKPlayer(p).isAfk()) {
 			if(this.getAfk_list().contains(p)) {
@@ -88,6 +93,8 @@ public class AFKManager {
 					}
 					player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&e" + p.getName() + " &fRevivio :D"));
 					p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 2.0f);
+					p.setGameMode(GameMode.SURVIVAL);
+					p.showPlayer(player);
 					afk.setAfk(false);
 					afk.setLoc(null);
 					afk.setPlayTime(0);
