@@ -1,0 +1,5 @@
+name: PapuAFK
+version: '${project.version}'
+main: com.bitnet.paulo.papuafk.Main
+api-version: 1.16
+softdepend: [ PlaceholderAPI, ProtocolLib ]
