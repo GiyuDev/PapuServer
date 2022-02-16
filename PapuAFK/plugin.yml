@@ -1,0 +1,11 @@
+main: com.bitnet.paulo.papuafk.Main
+name: PapuAFK
+version: 1.0
+author: Giyu
+api-version: 1.16
+softdepend:
+   - ProtocolLib
+   - PlaceholderAPI
+commands:
+   afk:
+      description: ""
