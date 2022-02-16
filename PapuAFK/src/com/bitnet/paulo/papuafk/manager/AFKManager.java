@@ -1,5 +1,6 @@
 package com.bitnet.paulo.papuafk.manager;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -75,7 +76,6 @@ public class AFKManager {
 						this.getPlugin().getDatabase().updateLastLocationDatabase(p);
 						this.getPlugin().getDatabase().updateAFKInventoryDatabase(p);
 						this.getPlugin().getDatabase().updateAFKArmorDatabase(p);
-						afk.setLoc(this.getPlugin().getDatabase().getLastLocationDatabase(p));
 						YamlConfiguration config = this.getPlugin().getDatabase().getPlayerFileConfig(p);
 						if(config.contains("location_afk")) {
 							p.teleport(this.getPlugin().getDatabase().getAFKLocationDatabase(p));
@@ -90,6 +90,7 @@ public class AFKManager {
 							if(this.getPlugin().isProtocolHook()) {
 								this.getPlugin().getPackets().sendHologram(p, Arrays.asList("&8&m<===============[&b+&8] &c&lOJITO &8[&b+&8&m]===============>", "&fEste pedazo de homosexual: &e%player_name%", "&fEsta AFK! pero ya va a regresar", "&8&m<===============[&b+&8] &c&lOJITO &8[&b+&8&m]===============>"), player);
 							}
+							afk.setLoc(this.getPlugin().getDatabase().getLastLocationDatabase(p));
 						}, 20L);
 					}
 					if(!this.afk_list.contains(player)) {
@@ -110,21 +111,38 @@ public class AFKManager {
 					p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 2.0f);
 					p.showPlayer(player);
 					afk.setAfk(false);
+					YamlConfiguration config = this.getPlugin().getDatabase().getPlayerFileConfig(p);
 					if(this.getPlugin().getDatabase().playerHasFile(p)) {
 						if(afk.getLoc() != null) {
 							p.teleport(this.getPlugin().getDatabase().getLastLocationDatabase(p));
+							Bukkit.getScheduler().runTaskLater(plugin, ()->{
+								config.set("last_location", "");								
+							}, 1L);
 						}
 						Bukkit.getScheduler().runTaskLater(plugin, ()-> {
 							if(!(this.getPlugin().getDatabase().getAFKInventoryDatabase(p).length == 0)) {
 								p.getInventory().setContents(this.getPlugin().getDatabase().getAFKInventoryDatabase(p));
+								Bukkit.getScheduler().runTaskLater(plugin, ()->{
+									config.set("inventory", "");	
+								}, 1L);
 							}
 							if(!(this.getPlugin().getDatabase().getAFKArmorDatabase(p).length == 0)) {
 								p.getInventory().setArmorContents(this.getPlugin().getDatabase().getAFKArmorDatabase(p));
+								Bukkit.getScheduler().runTaskLater(plugin, ()->{
+									config.set("armor", "");
+									
+								}, 1L);
 							}
 							if(this.getPlugin().isProtocolHook()) {
 								this.getPlugin().getPackets().deleteHologram(p);						
 							}
-						}, 20L);
+						}, 5L);
+						try {
+							config.save(this.getPlugin().getDatabase().getPlayerFile(p));
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 					}
 					afk.setPlayTime(0);
 					if(this.afk_list.contains(p)) {
