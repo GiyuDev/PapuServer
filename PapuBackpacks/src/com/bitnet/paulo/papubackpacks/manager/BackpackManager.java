@@ -108,4 +108,40 @@ public class BackpackManager {
 			}
 		}
 	}
+	
+	public void saveContents(Player p) {
+		if(this.playerHasInventory(p)) {
+			if(this.getDatabase().playerHasFile(p)) {
+				YamlConfiguration config = this.getDatabase().getPlayerFileConfig(p);
+				if(config.contains("contents")) {
+					Inventory inv = this.getInv_map().get(p);
+					if(inv.getContents().length > 0) {
+						List<ItemStack> list = Arrays.asList(inv.getContents());
+						config.set("contents", list);
+						try {
+							config.save(this.getDatabase().getPlayerFile(p));
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	public ItemStack[] getPlayerContents(Player p) {
+		if(this.playerHasInventory(p)) {
+			if(this.getDatabase().playerHasFile(p)) {
+				YamlConfiguration config = this.getDatabase().getPlayerFileConfig(p);
+				if(config.contains("contents")) {
+					if(!config.getList("contents").isEmpty()) {
+						ItemStack[] items = config.getList("contents").stream().map(i -> (ItemStack) i).toArray(ItemStack[]::new);
+						return items;
+					}
+				}
+			}
+		}
+		return null;
+	}
 }
