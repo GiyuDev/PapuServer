@@ -34,26 +34,26 @@ public class AFKTask implements Runnable {
 						case 30:
 							msg = "&e%player_name% &fbro? estas vivo?";
 							if(this.getPlugin().isPapihook()) {
-								msg = PlaceholderAPI.setPlaceholders(p, msg);
+								msg = PlaceholderAPI.setPlaceholders(player, msg);
 							}
-							p.sendMessage(ChatColor.translateAlternateColorCodes('&', msg));
-							p.playSound(p.getLocation(), Sound.BLOCK_ANVIL_LAND, 1.0f, 1.0f);
+							player.sendMessage(ChatColor.translateAlternateColorCodes('&', msg));
+							player.playSound(p.getLocation(), Sound.BLOCK_ANVIL_LAND, 1.0f, 1.0f);
 							break;
 						case 45:
 							msg = "&e%player_name% &fNo pos creo que esta muerto :v";
 							if(this.getPlugin().isPapihook()) {
-								msg = PlaceholderAPI.setPlaceholders(p, msg);
+								msg = PlaceholderAPI.setPlaceholders(player, msg);
 							}
-							p.sendMessage(ChatColor.translateAlternateColorCodes('&', msg));
-							p.playSound(p.getLocation(), Sound.BLOCK_ANVIL_LAND, 1.0f, 1.0f);
+							player.sendMessage(ChatColor.translateAlternateColorCodes('&', msg));
+							player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_LAND, 1.0f, 1.0f);
 							break;
 						case 55:
 							msg = "&e%player_name% &fnow suck that cock, cock, cock, cock, cock, cock, now shake that ass.";
 							if(this.getPlugin().isPapihook()) {
 								msg = PlaceholderAPI.setPlaceholders(p, msg);
 							}
-							p.sendMessage(ChatColor.translateAlternateColorCodes('&', msg));
-							p.playSound(p.getLocation(), Sound.BLOCK_ANVIL_LAND, 1.0f, 1.0f);
+							player.sendMessage(ChatColor.translateAlternateColorCodes('&', msg));
+							player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_LAND, 1.0f, 1.0f);
 							break;
 						case 60:
 							this.getPlugin().getAfkManager().actionsAFK(player);

@@ -72,13 +72,19 @@ public class PlayerListeners implements Listener {
 		}
 	}
 	
+	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void joinPackets(PlayerJoinEvent e) {
 		Player p = e.getPlayer();
-		for(Player player : this.getPlugin().getAfkManager().getAfk_list()) {
-			if(this.getPlugin().isProtocolHook()) {
-				this.getPlugin().getPackets().sendHologram(player, Arrays.asList("&8&m<===============[&b+&8] &c&lOJITO &8[&b+&8&m]===============>", "&fEste pedazo de homosexual: &e%player_name%", "&fEsta AFK! pero ya va a regresar", "&8&m<===============[&b+&8] &c&lOJITO &8[&b+&8&m]===============>"), p);
-				this.getPlugin().getPackets().replcePlayerEntity(player, p);
+		for(Player player : Bukkit.getOnlinePlayers()) {
+			if(this.getPlugin().getAfkManager().containsAFKPlayer(player)) {
+				AFKPlayer afk = this.getPlugin().getAfkManager().getAFKPlayer(player);
+				if(afk.isAfk()) {
+					if(this.getPlugin().isProtocolHook()) {
+						this.getPlugin().getPackets().sendHologram(player, Arrays.asList("&8&m<===============[&b+&8] &c&lOJITO &8[&b+&8&m]===============>", "&fEste pedazo de homosexual: &e%player_name%", "&fEsta AFK! pero ya va a regresar", "&8&m<===============[&b+&8] &c&lOJITO &8[&b+&8&m]===============>"), p);
+						player.hidePlayer(p);
+					}
+				}
 			}
 		}
 	}
@@ -109,8 +115,11 @@ public class PlayerListeners implements Listener {
 	public void cancelFoodLevelChange(FoodLevelChangeEvent e) {
 		Player p = (Player) e.getEntity();
 		if(this.getPlugin().getAfkManager().containsAFKPlayer(p)) {
-			if(this.getPlugin().getAfkManager().getAfk_list().contains(p)) {
+			AFKPlayer player = this.getPlugin().getAfkManager().getAFKPlayer(p);
+			if(player.isAfk()) {
 				e.setCancelled(true);
+			}else {
+				e.setCancelled(false);
 			}
 		}
 	}
@@ -132,11 +141,12 @@ public class PlayerListeners implements Listener {
 				for(Player player : this.getPlugin().getAfkManager().getAfk_list()) {
 					new BukkitRunnable() {
 
+						@SuppressWarnings("deprecation")
 						@Override
 						public void run() {
 							// TODO Auto-generated method stub
 							getPlugin().getPackets().sendHologram(player, Arrays.asList("&8&m<===============[&b+&8] &c&lOJITO &8[&b+&8&m]===============>", "&fEste pedazo de homosexual: &e%player_name%", "&fEsta AFK! pero ya va a regresar", "&8&m<===============[&b+&8] &c&lOJITO &8[&b+&8&m]===============>"), p);
-							getPlugin().getPackets().replcePlayerEntity(player, p);
+							player.hidePlayer(p);
 						}
 						
 					}.runTaskLater(this.getPlugin(), 5L);

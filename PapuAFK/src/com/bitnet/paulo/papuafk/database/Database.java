@@ -42,7 +42,6 @@ public class Database {
 				config.set("last_location", "");
 				config.set("inventory", new ArrayList<>());
 				config.set("armor", new ArrayList<>());
-				config.set("location_afk", "");
 				try {
 					config.save(this.getPlayerFile(p));
 				} catch (IOException e) {
@@ -71,14 +70,12 @@ public class Database {
 	public void updateAFKLocationDatabase(Player p) {
 		if(this.playerHasFile(p)) {
 			YamlConfiguration config = this.getPlayerFileConfig(p);
-			if(config.contains("location_afk")) {
-				config.set("location_afk", plugin.locToString(p.getLocation()));
-				try {
-					config.save(this.getPlayerFile(p));
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+			config.set("location_afk", plugin.locToString(p.getLocation()));
+			try {
+				config.save(this.getPlayerFile(p));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 	}

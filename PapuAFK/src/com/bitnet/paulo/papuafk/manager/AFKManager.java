@@ -8,6 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -75,7 +76,10 @@ public class AFKManager {
 						this.getPlugin().getDatabase().updateAFKInventoryDatabase(p);
 						this.getPlugin().getDatabase().updateAFKArmorDatabase(p);
 						afk.setLoc(this.getPlugin().getDatabase().getLastLocationDatabase(p));
-						p.teleport(this.getPlugin().getDatabase().getAFKLocationDatabase(p));
+						YamlConfiguration config = this.getPlugin().getDatabase().getPlayerFileConfig(p);
+						if(config.contains("location_afk")) {
+							p.teleport(this.getPlugin().getDatabase().getAFKLocationDatabase(p));
+						}
 						Bukkit.getScheduler().runTaskLater(plugin, ()->{
 							ItemStack[] nulled = {new ItemStack(Material.AIR)};
 							p.getInventory().setContents(nulled);
@@ -85,7 +89,6 @@ public class AFKManager {
 							p.getInventory().setBoots(new ItemStack(Material.AIR));
 							if(this.getPlugin().isProtocolHook()) {
 								this.getPlugin().getPackets().sendHologram(p, Arrays.asList("&8&m<===============[&b+&8] &c&lOJITO &8[&b+&8&m]===============>", "&fEste pedazo de homosexual: &e%player_name%", "&fEsta AFK! pero ya va a regresar", "&8&m<===============[&b+&8] &c&lOJITO &8[&b+&8&m]===============>"), player);
-								this.getPlugin().getPackets().replcePlayerEntity(p, player);
 							}
 						}, 20L);
 					}
@@ -108,7 +111,9 @@ public class AFKManager {
 					p.showPlayer(player);
 					afk.setAfk(false);
 					if(this.getPlugin().getDatabase().playerHasFile(p)) {
-						p.teleport(this.getPlugin().getDatabase().getLastLocationDatabase(p));
+						if(afk.getLoc() != null) {
+							p.teleport(this.getPlugin().getDatabase().getLastLocationDatabase(p));
+						}
 						Bukkit.getScheduler().runTaskLater(plugin, ()-> {
 							if(!(this.getPlugin().getDatabase().getAFKInventoryDatabase(p).length == 0)) {
 								p.getInventory().setContents(this.getPlugin().getDatabase().getAFKInventoryDatabase(p));
@@ -117,8 +122,7 @@ public class AFKManager {
 								p.getInventory().setArmorContents(this.getPlugin().getDatabase().getAFKArmorDatabase(p));
 							}
 							if(this.getPlugin().isProtocolHook()) {
-								this.getPlugin().getPackets().deleteHologram(p);
-								this.getPlugin().getPackets().deleteEntityPlayer(p);
+								this.getPlugin().getPackets().deleteHologram(p);						
 							}
 						}, 20L);
 					}
