@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -14,6 +15,7 @@ import com.bitnet.paulo.papuafk.commands.AFKCommand;
 import com.bitnet.paulo.papuafk.database.Database;
 import com.bitnet.paulo.papuafk.listeners.PlayerListeners;
 import com.bitnet.paulo.papuafk.manager.AFKManager;
+import com.bitnet.paulo.papuafk.player.AFKPlayer;
 import com.bitnet.paulo.papuafk.task.AFKTask;
 import com.bitnet.paulo.papuafk.utils.HologramItem;
 import com.bitnet.paulo.papuafk.utils.PacketsUtils;
@@ -137,5 +139,17 @@ public class Main extends JavaPlugin {
         float pitch = Float.parseFloat(split[5]);
         Location location = new Location(world, x, y, z, yaw, pitch);
         return location;
+    }
+    
+    @Override
+    public void onDisable() {
+    	for(Player p : Bukkit.getOnlinePlayers()) {
+    		if(this.getAfkManager().containsAFKPlayer(p)) {
+    			AFKPlayer afk = this.getAfkManager().getAFKPlayer(p);
+    			if(afk.isAfk()) {
+    				this.getAfkManager().actionsUnAFK(p);
+    			}
+    		}
+    	}
     }
 }
