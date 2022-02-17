@@ -15,6 +15,7 @@ import com.bitnet.paulo.papuafk.database.Database;
 import com.bitnet.paulo.papuafk.listeners.PlayerListeners;
 import com.bitnet.paulo.papuafk.manager.AFKManager;
 import com.bitnet.paulo.papuafk.task.AFKTask;
+import com.bitnet.paulo.papuafk.utils.HologramItem;
 import com.bitnet.paulo.papuafk.utils.PacketsUtils;
 
 public class Main extends JavaPlugin {
@@ -41,6 +42,7 @@ public class Main extends JavaPlugin {
     }
 	
 	private PacketsUtils packets;
+	private HologramItem holoItem;
 	
 	private boolean protocolHook = false;
 	private boolean papihook = false;
@@ -86,6 +88,7 @@ public class Main extends JavaPlugin {
 		this.getLogger().info("Iniciando el plugin...");
 		this.afkManager = new AFKManager(this);
 		this.packets = new PacketsUtils(this);
+		this.holoItem = new HologramItem(this);
 		this.database = new Database(this);
 		this.registerListener(new PlayerListeners(this));
 		this.registerCommands();
@@ -102,6 +105,10 @@ public class Main extends JavaPlugin {
 		return packets;
 	}
 	
+	public HologramItem getHoloItem() {
+		return holoItem;
+	}
+
 	public Database getDatabase() {
 		return database;
 	}

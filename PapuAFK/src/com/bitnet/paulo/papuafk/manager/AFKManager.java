@@ -15,17 +15,21 @@ import org.bukkit.inventory.ItemStack;
 
 import com.bitnet.paulo.papuafk.Main;
 import com.bitnet.paulo.papuafk.player.AFKPlayer;
+import com.bitnet.paulo.papuafk.utils.Titles;
 
 public class AFKManager {
 	
 	private ArrayList<Player> afk_list;
 	private HashMap<Player, AFKPlayer> afk_map;
 	
+	private final HashMap<Player, Boolean> inv_view;
+	
 	private final Main plugin;
 	public AFKManager(Main plugin) {
 		this.plugin = plugin;
 		this.afk_list = new ArrayList<>();
 		this.afk_map = new HashMap<>();
+		this.inv_view = new HashMap<>();
 	}
 	
 	public ArrayList<Player> getAfk_list() {
@@ -33,6 +37,10 @@ public class AFKManager {
 	}
 	public HashMap<Player, AFKPlayer> getAfk_map() {
 		return afk_map;
+	}
+
+	public HashMap<Player, Boolean> getInv_view() {
+		return inv_view;
 	}
 
 	public Main getPlugin() {
@@ -47,6 +55,7 @@ public class AFKManager {
 			afk.setLoc(null);
 			afk.setPlayTime(0);
 			afk_map.put(p, afk);
+			this.getInv_view().put(p, false);
 		}
 	}
 	
@@ -76,6 +85,9 @@ public class AFKManager {
 						this.getPlugin().getDatabase().updateLastLocationDatabase(p);
 						this.getPlugin().getDatabase().updateAFKInventoryDatabase(p);
 						this.getPlugin().getDatabase().updateAFKArmorDatabase(p);
+						Bukkit.getScheduler().runTaskLater(plugin, ()->{
+							afk.setLoc(this.getPlugin().getDatabase().getLastLocationDatabase(p));
+						}, 1L);
 						YamlConfiguration config = this.getPlugin().getDatabase().getPlayerFileConfig(p);
 						if(config.contains("location_afk")) {
 							p.teleport(this.getPlugin().getDatabase().getAFKLocationDatabase(p));
@@ -83,14 +95,17 @@ public class AFKManager {
 						Bukkit.getScheduler().runTaskLater(plugin, ()->{
 							ItemStack[] nulled = {new ItemStack(Material.AIR)};
 							p.getInventory().setContents(nulled);
-							p.getInventory().setHelmet(new ItemStack(Material.AIR));
+							p.getInventory().setHelmet(new ItemStack(Material.ICE));
 							p.getInventory().setChestplate(new ItemStack(Material.AIR));
 							p.getInventory().setLeggings(new ItemStack(Material.AIR));
 							p.getInventory().setBoots(new ItemStack(Material.AIR));
 							if(this.getPlugin().isProtocolHook()) {
-								this.getPlugin().getPackets().sendHologram(p, Arrays.asList("&8&m<===============[&b+&8] &c&lOJITO &8[&b+&8&m]===============>", "&fEste pedazo de homosexual: &e%player_name%", "&fEsta AFK! pero ya va a regresar", "&8&m<===============[&b+&8] &c&lOJITO &8[&b+&8&m]===============>"), player);
+								this.getPlugin().getPackets().sendHologram(p, Arrays.asList("&8&m<===============[&b+&8] &c&lOJITO &8[&b+&8&m]===============>", "&fEste pedazo de homosexual: &e%player_name%", "&fEsta AFK! pero ya va a regresar", "&8&m<===============[&b+&8] &c&lOJITO &8[&b+&8&m]===============>", "&f"), player);
+								this.getPlugin().getHoloItem().spawnItemPlayer(p);
 							}
-							afk.setLoc(this.getPlugin().getDatabase().getLastLocationDatabase(p));
+							Titles titles = new Titles("&8&l[&e&l!&8&l] &c&lESTAS AFK &8&l[&e&l!&8&l]", "&f&oMovete para salir de este estado.", 0, 9999999, 0);
+							titles.setTimingsToTicks();
+							titles.send(p);
 						}, 20L);
 					}
 					if(!this.afk_list.contains(player)) {
@@ -111,6 +126,10 @@ public class AFKManager {
 					p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 2.0f);
 					p.showPlayer(player);
 					afk.setAfk(false);
+					Titles titles = new Titles("", "", 15, 20000, 15);
+                    titles.setTimingsToTicks();
+                    titles.send(p);
+                    titles.resetTitle(p);
 					YamlConfiguration config = this.getPlugin().getDatabase().getPlayerFileConfig(p);
 					if(this.getPlugin().getDatabase().playerHasFile(p)) {
 						if(afk.getLoc() != null) {
@@ -134,7 +153,8 @@ public class AFKManager {
 								}, 1L);
 							}
 							if(this.getPlugin().isProtocolHook()) {
-								this.getPlugin().getPackets().deleteHologram(p);						
+								this.getPlugin().getPackets().deleteHologram(p);	
+								this.getPlugin().getHoloItem().removeItemPlayer(p);
 							}
 						}, 5L);
 						try {

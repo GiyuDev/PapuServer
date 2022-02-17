@@ -11,6 +11,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -82,7 +85,7 @@ public class PlayerListeners implements Listener {
 				AFKPlayer afk = this.getPlugin().getAfkManager().getAFKPlayer(player);
 				if(afk.isAfk()) {
 					if(this.getPlugin().isProtocolHook()) {
-						this.getPlugin().getPackets().sendHologram(player, Arrays.asList("&8&m<===============[&b+&8] &c&lOJITO &8[&b+&8&m]===============>", "&fEste pedazo de homosexual: &e%player_name%", "&fEsta AFK! pero ya va a regresar", "&8&m<===============[&b+&8] &c&lOJITO &8[&b+&8&m]===============>"), p);
+						this.getPlugin().getPackets().sendHologram(player, Arrays.asList("&8&m<===============[&b+&8] &c&lOJITO &8[&b+&8&m]===============>", "&fEste pedazo de homosexual: &e%player_name%", "&fEsta AFK! pero ya va a regresar", "&8&m<===============[&b+&8] &c&lOJITO &8[&b+&8&m]===============>", "&f"), p);
 						player.hidePlayer(p);
 					}
 				}
@@ -151,11 +154,41 @@ public class PlayerListeners implements Listener {
 							@Override
 							public void run() {
 								// TODO Auto-generated method stub
-								getPlugin().getPackets().sendHologram(player, Arrays.asList("&8&m<===============[&b+&8] &c&lOJITO &8[&b+&8&m]===============>", "&fEste pedazo de homosexual: &e%player_name%", "&fEsta AFK! pero ya va a regresar", "&8&m<===============[&b+&8] &c&lOJITO &8[&b+&8&m]===============>"), p);
+								getPlugin().getPackets().sendHologram(player, Arrays.asList("&8&m<===============[&b+&8] &c&lOJITO &8[&b+&8&m]===============>", "&fEste pedazo de homosexual: &e%player_name%", "&fEsta AFK! pero ya va a regresar", "&8&m<===============[&b+&8] &c&lOJITO &8[&b+&8&m]===============>", "&f"), p);
 							}
 							
 						}.runTaskLater(this.getPlugin(), 5L);
 					}
+				}
+			}
+		}
+	}
+	
+	@EventHandler(priority = EventPriority.HIGH)
+	public void checkinvView(InventoryOpenEvent e) {
+		if(e.getView().getTopInventory().getType() == InventoryType.WORKBENCH || e.getView().getTopInventory().getType() == InventoryType.ENCHANTING ||
+				e.getView().getTopInventory().getType() == InventoryType.ANVIL || e.getView().getTopInventory().getType() == InventoryType.FURNACE || e.getView().getTopInventory().getType() == InventoryType.CHEST
+				|| e.getView().getTopInventory().getType() == InventoryType.ENDER_CHEST) {
+			Player p = (Player) e.getPlayer();
+			if(this.getPlugin().getAfkManager().getInv_view().containsKey(p)) {
+				boolean evaluate = this.getPlugin().getAfkManager().getInv_view().get(p);
+				if(!evaluate) {
+					this.getPlugin().getAfkManager().getInv_view().put(p, true);
+				}
+			}
+		}
+	}
+	
+	@EventHandler(priority = EventPriority.HIGH)
+	public void closeInv(InventoryCloseEvent e) {
+		if(e.getView().getTopInventory().getType() == InventoryType.WORKBENCH || e.getView().getTopInventory().getType() == InventoryType.ENCHANTING ||
+				e.getView().getTopInventory().getType() == InventoryType.ANVIL || e.getView().getTopInventory().getType() == InventoryType.FURNACE || e.getView().getTopInventory().getType() == InventoryType.CHEST
+				|| e.getView().getTopInventory().getType() == InventoryType.ENDER_CHEST) {
+			Player p = (Player) e.getPlayer();
+			if(this.getPlugin().getAfkManager().getInv_view().containsKey(p)) {
+				boolean evaluate = this.getPlugin().getAfkManager().getInv_view().get(p);
+				if(evaluate) {
+					this.getPlugin().getAfkManager().getInv_view().put(p, false);
 				}
 			}
 		}
