@@ -3,3 +3,8 @@ name: PapuBackpacks
 version: 1.0
 api-version: 1.16
 author: Giyu
+
+commands:
+   backpack:
+      description: ""
+      aliases: [mochila]

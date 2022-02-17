@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -21,13 +22,11 @@ public class BackpackManager {
 	private final Database database;
 	
 	private final HashMap<Player, Inventory> inv_map;
-	private final HashMap<Player, Boolean> isWatching;
 	
 	private final Main plugin;
 	public BackpackManager(Main plugin, Database database) {
 		this.plugin = plugin;
 		this.inv_map = new HashMap<>();
-		this.isWatching = new HashMap<>();
 		this.database = database;
 		Bukkit.getScheduler().runTaskTimer(this.getPlugin(), ()->{
 			this.saveAllContents();
@@ -36,10 +35,6 @@ public class BackpackManager {
 	
 	public HashMap<Player, Inventory> getInv_map() {
 		return inv_map;
-	}
-	
-	public HashMap<Player, Boolean> getIsWatching() {
-		return isWatching;
 	}
 
 	public Main getPlugin() {
@@ -135,10 +130,18 @@ public class BackpackManager {
 			if(this.getDatabase().playerHasFile(p)) {
 				YamlConfiguration config = this.getDatabase().getPlayerFileConfig(p);
 				if(config.contains("contents")) {
-					if(!config.getList("contents").isEmpty()) {
-						ItemStack[] items = config.getList("contents").stream().map(i -> (ItemStack) i).toArray(ItemStack[]::new);
+					if(config.isList("contents")) {
+						if(!config.getList("contents").isEmpty()) {
+							ItemStack[] items = config.getList("contents").stream().map(i -> (ItemStack) i).toArray(ItemStack[]::new);
+							return items;
+						}
+					}else {
+						ItemStack[] items = {new ItemStack(Material.AIR)};
 						return items;
 					}
+				}else {
+					ItemStack[] items = {new ItemStack(Material.AIR)};
+					return items;
 				}
 			}
 		}
